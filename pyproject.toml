@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "catasyn"
+version = "0.1.0"
+description = "Simple Catalogue (schema, topic, consumer, metadata) Synchronisation"
+authors = ["Antonio <antonio.one@pm.me>"]
+license = "TBC"
+readme = "README.md"
+homepage = "https://github.com/antonio-one/catasyn"
+repository = "https://github.com/antonio-one/catasyn"
+keywords = ["python", "flask", "data", "synchronisation", "api", "pubsub", "bigquery", "beam"]
+
+[tool.poetry.dependencies]
+python = ">=3.8.0,<3.10"
+Flask = "^1.1.2"
+Flask-API = "^2.0"
+python-decouple = "^3.4"
+google-cloud-bigquery = "^2.7.0"
+pendulum = "^2.1.2"
+datcat = {path = "../datcat/dist/datcat-0.1.1-py3-none-any.whl"}
+
+
+[tool.poetry.dev-dependencies]
+pre-commit = "^2.10.0"
+pytest = "^6.2.2"
+pytest-cov = "^2.11.1"
+pytest-env = "^0.6.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

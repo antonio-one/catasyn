@@ -1,0 +1,25 @@
+[
+  {
+    "description": "Schema name",
+    "mode": "REQUIRED",
+    "name": "SCHEMA_NAME",
+    "type": "STRING"
+  },
+  {
+    "description": "Schema version",
+    "mode": "REQUIRED",
+    "name": "SCHEMA_VERSION",
+    "type": "INTEGER"
+  },
+  {
+    "description": "Event type identifier",
+    "mode": "REQUIRED",
+    "name": "EVENT_TYPE_ID",
+    "type": "INTEGER"
+  },  {
+    "description": "Date and time the event was generated from source",
+    "mode": "REQUIRED",
+    "name": "EVENT_DATETIME",
+    "type": "DATETIME"
+  }
+]

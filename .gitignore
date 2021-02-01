@@ -1,0 +1,10 @@
+.venv
+.idea
+__pycache__
+.secrets
+.env
+build.sh
+catalogue/schemas/*.json
+.old
+dist
+.coverage
