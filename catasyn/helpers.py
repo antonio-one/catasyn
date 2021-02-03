@@ -1,16 +1,23 @@
 import typing
 from urllib.parse import urlunsplit
 
-from settings import CATALOGUE_SCHEME, CATALOGUE_HOST, CATALOGUE_PORT
 
+def catalogue_url(scheme: str, host: str, port: str, route: str, query: typing.Dict[str, typing.Any] = {}):
+    """
 
-def catalogue_url(route: str, refresh: bool = False):
+    :param scheme: e.g "http"
+    :param host: e.g "0.0.0.0"
+    :param port: e.g "80"
+    :param route: e.g "schemas"
+    :param query: e.g refresh=True, or nothing if you are passing this as a barebone url to response.get and have already params=
+    :return:
+    """
     return urlunsplit((
-        CATALOGUE_SCHEME,
-        f"{CATALOGUE_HOST}:{CATALOGUE_PORT}",
+        scheme,
+        f"{host}:{port}",
         route,
-        f"refresh={refresh}",
-        "",
+        query,
+        "",     # fragment. Leaving it empty at the moment
     ))
 
 
