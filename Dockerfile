@@ -28,4 +28,5 @@ ADD .secrets/ ./.secrets
 
 RUN pip3 install ${APPDIR}/${WHEEL}
 
-ENTRYPOINT ["bash", "./entrypoints/multi.sh"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]
+#ENTRYPOINT ["bash", "./entrypoints/multi.sh"]

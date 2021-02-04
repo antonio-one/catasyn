@@ -5,7 +5,7 @@ from time import sleep
 
 from catasyn.settings import SCHEDULE_INTERVAL_SECONDS, SCHEDULE_SLEEP_SECONDS, \
     SCHEDULER_LOG_FILENAME, DATCAT_SCHEME, DATCAT_HOST, DATCAT_PORT, DATASET, CLOUD_PROJECT_ID
-from catasyn.service_layer.synchroniser import Synchroniser
+from catasyn.service_layer.synchroniser import TableSynchroniser
 import requests
 from urllib.parse import urlunsplit
 
@@ -33,7 +33,7 @@ def synchronise_all_schemas():
 
     for schema in schemas.json():
         table_id = f"{CLOUD_PROJECT_ID}.{DATASET}.{schema}"
-        syn = Synchroniser(table_id=table_id)
+        syn = TableSynchroniser(table_id=table_id)
         synchronised_status: bool = syn.synchronise()
         if synchronised_status:
             message = f"Creating `{table_id}` {synchronised_status=}."
