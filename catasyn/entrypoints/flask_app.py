@@ -1,5 +1,7 @@
+import typing
+
 from flask_api import FlaskAPI
-from flask import jsonify, redirect
+from flask import redirect
 from catasyn.settings import CATASYN_HOST, CATASYN_PORT, CATASYN_DEBUG
 
 app = FlaskAPI(__name__)
@@ -7,15 +9,19 @@ app = FlaskAPI(__name__)
 
 @app.route("/")
 def default():
-    return redirect("/synchronise/all", code=302)
+    return redirect("/synchronise", code=302)
 
 
-# @app.route("/synchronise/one", methods=["GET"])
-@app.route("/synchronise/all", methods=["GET"])
-def view_synchronisation_status():
-    # TODO: how to run a scheduler asynchronously to a flask page as part of the same container?
-    with open("../schedule.log", "r") as sl:
-        return jsonify(sl.read())
+@app.route("/synchronise/", methods=["GET"])
+def synchronise():
+    return "all schemas: synchronise/schemas\n" \
+           "all versions of a schema: synchronise/schema/{}\n" \
+           "schema: synchronise/schema/{}/version/{}\n" \
+           "all metadata: synchronise/metadata\n" \
+           "all topics: synchronise/metadata/topic\n" \
+           "one topic: synchronise/metadata/topic/{}\n" \
+           "all subscriptions: synchronise/metadata/subscriptions\n" \
+           "one subscription: synchronise/metadata/subscription/{}\n"
 
 
 def main() -> None:

@@ -22,7 +22,7 @@ class Synchroniser:
         # TODO: make this a table_or_tables: typing.Union[cs_model.TableId, cs_model.ListOfTables]
         self.credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
         self.client = bigquery.Client(project=CLOUD_PROJECT_ID, credentials=self.credentials, location=LOCATION)
-        self.table_id: str = table_id
+        self.table_id = table_id
 
     def create_table(self) -> bool:
         # TODO: make this create_table_or_tables
@@ -66,7 +66,7 @@ class Synchroniser:
         return schema
 
     @property
-    def schema_is_identical(self):
+    def schema_is_identical(self) -> bool:
         return self.schema_from_catalogue == self.schema_from_dataset
 
     def synchronise(self) -> bool:
@@ -77,14 +77,14 @@ class Synchroniser:
             pass: if the table exists and the target schema is identical
             create: if the table does not exist
         """
-        created = False
+        is_created: bool = False
         if not self.table_exists:
-            created = self.create_table()
+            is_created = self.create_table()
         elif not self.schema_is_identical:
             raise UnexpectedSchema(f"The catalogue/dataset schemas of {self.table_id} are not the same!")
         else:
             pass
-        return created
+        return is_created
 
     @property
     def table_exists(self) -> bool:

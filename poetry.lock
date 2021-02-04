@@ -181,7 +181,7 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2)"]
 
 [[package]]
 name = "google-auth"
-version = "1.24.0"
+version = "1.25.0"
 description = "Google Authentication Library"
 category = "main"
 optional = false
@@ -783,8 +783,8 @@ google-api-core = [
     {file = "google_api_core-1.25.1-py2.py3-none-any.whl", hash = "sha256:292dd636ed381098d24b7093ccb826b2278a12d886a3fc982084069aa24a8fbb"},
 ]
 google-auth = [
-    {file = "google-auth-1.24.0.tar.gz", hash = "sha256:0b0e026b412a0ad096e753907559e4bdb180d9ba9f68dd9036164db4fdc4ad2e"},
-    {file = "google_auth-1.24.0-py2.py3-none-any.whl", hash = "sha256:ce752cc51c31f479dbf9928435ef4b07514b20261b021c7383bee4bda646acb8"},
+    {file = "google-auth-1.25.0.tar.gz", hash = "sha256:514e39f4190ca972200ba33876da5a8857c5665f2b4ccc36c8b8ee21228aae80"},
+    {file = "google_auth-1.25.0-py2.py3-none-any.whl", hash = "sha256:008e23ed080674f69f9d2d7d80db4c2591b9bb307d136cea7b3bc129771d211d"},
 ]
 google-cloud-bigquery = [
     {file = "google-cloud-bigquery-2.7.0.tar.gz", hash = "sha256:29721972f5e539e486fbdc722ddf849ad86acd092680d16c271430dc16023544"},

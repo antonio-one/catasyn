@@ -26,7 +26,8 @@ pytest-cov = "^2.11.1"
 pytest-env = "^0.6.2"
 
 [tool.poetry.scripts]
-scheduler = "catasyn.service_layer.scheduler:main"
+scheduler = "catasyn.entrypoints.scheduler:main"
+app = "catasyn.entrypoints.flask_app:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
