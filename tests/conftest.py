@@ -10,7 +10,7 @@ from catasyn.settings import CLOUD_PROJECT_ID, LOCATION
 
 import requests
 
-DATCAT_NETLOC = f'{DATCAT_HOST}:{DATCAT_PORT}'
+DATCAT_NETLOC = f"{DATCAT_HOST}:{DATCAT_PORT}"
 DATCAT_ROUTE = "search_by_key"
 
 

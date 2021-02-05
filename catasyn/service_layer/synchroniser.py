@@ -3,19 +3,14 @@ from google.cloud import bigquery
 from google.cloud.exceptions import NotFound
 from datcat.domain import model as dc_model
 from catasyn.domain import model as cs_model
-from urllib.parse import parse_qs, urlunsplit
+from urllib.parse import urlunsplit
 import logging
 
 from catasyn.settings import (
     DATCAT_SCHEME, DATCAT_HOST, DATCAT_PORT,
-    CLOUD_PROJECT_ID, LOCATION, GOOGLE_APPLICATION_CREDENTIALS,
-    SCHEDULER_LOG_FILENAME
+    CLOUD_PROJECT_ID, LOCATION, GOOGLE_APPLICATION_CREDENTIALS
 )
 from google.oauth2 import service_account
-
-FORMAT = "%(asctime)s %(levelname)s %(message)s"
-filename = SCHEDULER_LOG_FILENAME
-logging.basicConfig(filename=filename, level=logging.INFO, format=FORMAT)
 
 DATCAT_NETLOC = f"{DATCAT_HOST}:{DATCAT_PORT}"
 
@@ -67,8 +62,7 @@ class TableSynchroniser:
     def schema_from_dataset(self) -> dc_model.SchemaDefinition:
         # TODO: CONTINUE THIS!
         schema: dc_model.SchemaDefinition = []
-        # field: dc_model.SchemaField = {}
-        table = bigquery.Table(self.table_id, schema=self.schema_from_catalogue())
+        table = self.client.get_table(self.table_id)
         for field in table.to_api_repr()["schema"]["fields"]:
             sorted_fields = dict(sorted(field.items(), key=lambda k: k[0]))
             schema.append(sorted_fields)
@@ -85,15 +79,20 @@ class TableSynchroniser:
             pass: if the table exists and the target schema is identical
             create: if the table does not exist
         """
-        is_created: bool = False
         if not self.table_exists:
-            is_created = self.create_table()
-        elif not self.schema_is_identical:
-            message: str = f"The catalogue/dataset schemas of {self.table_id} are not the same!"
+            message: str = f"`{self.table_id}` Does not exist. Creating..."
+            logging.info(message)
+            return self.create_table()
+
+        elif self.table_exists and not self.schema_is_identical:
+            message: str = f"The catalogue and dataset schemas of {self.table_id} are not the same!"
             logging.error(message)
+            return False
+
         else:
-            pass
-        return is_created
+            message: str = f"`{self.table_id} exists. Schema is valid. Doing nothing."
+            logging.info(message)
+            return None
 
     @property
     def table_exists(self) -> bool:

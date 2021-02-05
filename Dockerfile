@@ -28,5 +28,6 @@ ADD .secrets/ ./.secrets
 
 RUN pip3 install ${APPDIR}/${WHEEL}
 
-ENTRYPOINT ["tail", "-f", "/dev/null"]
+#ENTRYPOINT ["tail", "-f", "/dev/null"]
 #ENTRYPOINT ["bash", "./entrypoints/multi.sh"]
+ENTRYPOINT ["python", "entrypoints/scheduler.py"]

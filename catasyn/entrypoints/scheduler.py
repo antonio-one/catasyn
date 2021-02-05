@@ -3,15 +3,12 @@ import logging
 import typing
 from time import sleep
 
-from catasyn.settings import SCHEDULE_INTERVAL_SECONDS, SCHEDULE_SLEEP_SECONDS, \
-    SCHEDULER_LOG_FILENAME, DATCAT_SCHEME, DATCAT_HOST, DATCAT_PORT, DATASET, CLOUD_PROJECT_ID
+from catasyn.settings import (SCHEDULE_INTERVAL_SECONDS, SCHEDULE_SLEEP_SECONDS,
+                              DATCAT_SCHEME, DATCAT_HOST, DATCAT_PORT, DATASET,
+                              CLOUD_PROJECT_ID)
 from catasyn.service_layer.synchroniser import TableSynchroniser
 import requests
 from urllib.parse import urlunsplit
-
-FORMAT = "%(asctime)s %(levelname)s %(message)s"
-filename = SCHEDULER_LOG_FILENAME
-logging.basicConfig(filename=filename, level=logging.INFO, format=FORMAT)
 
 
 def synchronise_all_schemas():
@@ -23,9 +20,9 @@ def synchronise_all_schemas():
     try:
         schemas = requests.get(url=url)
         schemas.raise_for_status()
-    except requests.exceptions.ConnectionError as ce:
-        message = f"{ce}"
-        logging.warning(message)
+    except requests.exceptions.ConnectionError:
+        message = f"message here"
+        logging.exception(message)
         return
     else:
         message = f"{url} returned status {schemas.status_code}"
@@ -35,11 +32,8 @@ def synchronise_all_schemas():
         table_id = f"{CLOUD_PROJECT_ID}.{DATASET}.{schema}"
         syn = TableSynchroniser(table_id=table_id)
         synchronised_status: bool = syn.synchronise()
-        if synchronised_status:
-            message = f"Creating `{table_id}` {synchronised_status=}."
-        else:
-            message = f"Doing nothing. Table `{table_id}` has already been created and has identical schema."
-        logging.info(message)
+        message = f"`{table_id}` {synchronised_status=}"
+        logging.debug(message)
 
 
 def main():
