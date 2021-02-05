@@ -1,0 +1,14 @@
+services:
+
+  datcat:
+    image: antonioone/datcat
+    ports:
+      - 50000:8081
+
+  catasyn:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: catasyn
+    ports:
+      - 50001:8081

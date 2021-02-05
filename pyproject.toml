@@ -15,15 +15,19 @@ Flask = "^1.1.2"
 Flask-API = "^2.0"
 python-decouple = "^3.4"
 google-cloud-bigquery = "^2.7.0"
-pendulum = "^2.1.2"
-datcat = {path = "../datcat/dist/datcat-0.1.1-py3-none-any.whl"}
-
+schedule = "^1.0.0"
+google-auth = "^1.24.0"
+datcat = "^0.1.3"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.10.0"
 pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
 pytest-env = "^0.6.2"
+
+[tool.poetry.scripts]
+scheduler = "catasyn.entrypoints.scheduler:main"
+app = "catasyn.entrypoints.flask_app:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
