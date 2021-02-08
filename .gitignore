@@ -7,4 +7,5 @@ build.sh
 catalogue/schemas/*.json
 .old
 dist
-.coverage
+.coverage--all
+MAPPINGS_FILEPATH not found. Declare it as envvar or define a default value.git branchgitgit checkout main
