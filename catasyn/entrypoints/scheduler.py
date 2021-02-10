@@ -1,18 +1,35 @@
-import schedule
 import logging
 import typing
 from time import sleep
-
-from catasyn.settings import (SCHEDULE_INTERVAL_SECONDS, SCHEDULE_SLEEP_SECONDS,
-                              DATCAT_SCHEME, DATCAT_HOST, DATCAT_PORT, DATASET,
-                              CLOUD_PROJECT_ID)
-from catasyn.service_layer.synchroniser import TableSynchroniser, TopicSynchroniser, SubscriptionSynchroniser
-import requests
 from urllib.parse import urlunsplit
+
+import requests
+import schedule
+
+from catasyn.service_layer.synchroniser import (
+    SubscriptionSynchroniser,
+    TableSynchroniser,
+    TopicSynchroniser,
+)
+from catasyn.settings import (
+    CLOUD_PROJECT_ID,
+    DATASET,
+    DATCAT_HOST,
+    DATCAT_PORT,
+    DATCAT_SCHEME,
+    SCHEDULE_INTERVAL_SECONDS,
+    SCHEDULE_SLEEP_SECONDS,
+)
 
 
 def synchronise_all_schemas():
-    url_components: typing.Tuple = (DATCAT_SCHEME, f"{DATCAT_HOST}:{DATCAT_PORT}", "", "", "")
+    url_components: typing.Tuple = (
+        DATCAT_SCHEME,
+        f"{DATCAT_HOST}:{DATCAT_PORT}",
+        "",
+        "",
+        "",
+    )
     url = urlunsplit(url_components)
 
     # schemas.raise_for_status()
@@ -36,7 +53,13 @@ def synchronise_all_schemas():
 
 
 def synchronise_all_topics():
-    url_components: typing.Tuple = (DATCAT_SCHEME, f"{DATCAT_HOST}:{DATCAT_PORT}", "mappings", "refresh=True", "")
+    url_components: typing.Tuple = (
+        DATCAT_SCHEME,
+        f"{DATCAT_HOST}:{DATCAT_PORT}",
+        "mappings",
+        "refresh=True",
+        "",
+    )
     url = urlunsplit(url_components)
 
     try:
@@ -55,14 +78,18 @@ def synchronise_all_topics():
         topic_path = f"projects/{CLOUD_PROJECT_ID}/topics/{topic_name}"
 
         subscription_name = mappings["subscription_name"]
-        subscription_path = f"projects/{CLOUD_PROJECT_ID}/subscriptions/{subscription_name}"
+        subscription_path = (
+            f"projects/{CLOUD_PROJECT_ID}/subscriptions/{subscription_name}"
+        )
 
         syn = TopicSynchroniser(topic_path=topic_path)
         synchronised_status: bool = syn.synchronise()
         message = f"{topic_path=}, {synchronised_status=}"
         logging.debug(message)
 
-        syn = SubscriptionSynchroniser(subscription_path=subscription_path, topic_path=topic_path)
+        syn = SubscriptionSynchroniser(
+            subscription_path=subscription_path, topic_path=topic_path
+        )
         synchronised_status: bool = syn.synchronise()
         message = f"{subscription_path=}, {synchronised_status=}"
         logging.debug(message)

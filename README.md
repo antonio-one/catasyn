@@ -1,6 +1,6 @@
 ##Catasyn
 
-A simple data catalogue synchronisation service. 
+A simple data catalogue synchronisation service.
 
 For this to run make sure [datcat](https://github.com/antonio-one/datcat) is running in a container.
 

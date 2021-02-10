@@ -1,17 +1,22 @@
-import requests
-from google.cloud import bigquery, pubsub_v1
-from google.cloud.exceptions import NotFound
-from datcat.domain import model as dc_model
-from catasyn.domain import model as cs_model
-from urllib.parse import urlunsplit
 import logging
 from os import environ
+from urllib.parse import urlunsplit
 
-from catasyn.settings import (
-    DATCAT_SCHEME, DATCAT_HOST, DATCAT_PORT,
-    CLOUD_PROJECT_ID, LOCATION, GOOGLE_APPLICATION_CREDENTIALS
-)
+import requests
+from datcat.domain import model as dc_model
+from google.cloud import bigquery, pubsub_v1
+from google.cloud.exceptions import NotFound
 from google.oauth2 import service_account
+
+from catasyn.domain import model as cs_model
+from catasyn.settings import (
+    CLOUD_PROJECT_ID,
+    DATCAT_HOST,
+    DATCAT_PORT,
+    DATCAT_SCHEME,
+    GOOGLE_APPLICATION_CREDENTIALS,
+    LOCATION,
+)
 
 DATCAT_NETLOC = f"{DATCAT_HOST}:{DATCAT_PORT}"
 
@@ -25,7 +30,9 @@ class UnexpectedSchema(Exception):
 
 class ServiceAccount:
     def __init__(self):
-        self.credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
+        self.credentials = service_account.Credentials.from_service_account_file(
+            GOOGLE_APPLICATION_CREDENTIALS
+        )
 
 
 class TableSynchroniser(ServiceAccount):
@@ -37,10 +44,13 @@ class TableSynchroniser(ServiceAccount):
     If it's the same do nothing
     TODO: maybe save the state somewhere so table existence does not have to be checked all the time.
     """
+
     def __init__(self, table_id: cs_model.TableId):
         # TODO: make this a table_or_tables: typing.Union[cs_model.TableId, cs_model.ListOfTables]
         super().__init__()
-        self.client = bigquery.Client(project=CLOUD_PROJECT_ID, credentials=self.credentials, location=LOCATION)
+        self.client = bigquery.Client(
+            project=CLOUD_PROJECT_ID, credentials=self.credentials, location=LOCATION
+        )
         self.table_id = table_id
 
     def create_table(self) -> bool:
@@ -58,8 +68,14 @@ class TableSynchroniser(ServiceAccount):
         :return:
             Schema definition in json. E.g see tests/schema/schema_one_v1.json
         """
-        url = urlunsplit((DATCAT_SCHEME, DATCAT_NETLOC, "/schemas/search_by_key", "", ""))
-        params = {"schema_class_name": self.table_name, "schema_version": self.table_version, "refresh": True}
+        url = urlunsplit(
+            (DATCAT_SCHEME, DATCAT_NETLOC, "/schemas/search_by_key", "", "")
+        )
+        params = {
+            "schema_class_name": self.table_name,
+            "schema_version": self.table_version,
+            "refresh": True,
+        }
         response = requests.get(url=url, params=params)
 
         response.raise_for_status()
@@ -142,6 +158,7 @@ class TopicSynchroniser:
     """
     This synchronises topics and subscribers
     """
+
     def __init__(self, topic_path: str):
         super().__init__()
         self.publisher = pubsub_v1.PublisherClient()
@@ -174,6 +191,7 @@ class SubscriptionSynchroniser:
     """
     This synchronises topics and subscribers
     """
+
     def __init__(self, subscription_path: str, topic_path: str):
         super().__init__()
         self.subscriber = pubsub_v1.SubscriberClient()
@@ -181,7 +199,9 @@ class SubscriptionSynchroniser:
         self.topic_path = topic_path
 
     def create_subscription(self) -> bool:
-        self.subscriber.create_subscription(request={"name": self.subscription_path, "topic": self.topic_path})
+        self.subscriber.create_subscription(
+            request={"name": self.subscription_path, "topic": self.topic_path}
+        )
         return self.subscription_exists
 
     @property
@@ -190,7 +210,9 @@ class SubscriptionSynchroniser:
 
     @property
     def subscription_exists(self) -> bool:
-        for subscription in self.subscriber.list_subscriptions(request={"project": self.project_path}):
+        for subscription in self.subscriber.list_subscriptions(
+            request={"project": self.project_path}
+        ):
             if subscription.name == self.subscription_path:
                 return True
         return False
