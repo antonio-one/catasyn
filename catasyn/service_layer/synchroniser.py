@@ -1,10 +1,11 @@
 import requests
-from google.cloud import bigquery
+from google.cloud import bigquery, pubsub_v1
 from google.cloud.exceptions import NotFound
 from datcat.domain import model as dc_model
 from catasyn.domain import model as cs_model
 from urllib.parse import urlunsplit
 import logging
+from os import environ
 
 from catasyn.settings import (
     DATCAT_SCHEME, DATCAT_HOST, DATCAT_PORT,
@@ -14,13 +15,20 @@ from google.oauth2 import service_account
 
 DATCAT_NETLOC = f"{DATCAT_HOST}:{DATCAT_PORT}"
 
+# pubsub clients are suspected to only read from the env variable
+environ["GOOGLE_APPLICATION_CREDENTIALS"] = GOOGLE_APPLICATION_CREDENTIALS
 
-# TODO: break out to separate module once we have more custom exceptions
+
 class UnexpectedSchema(Exception):
     pass
 
 
-class TableSynchroniser:
+class ServiceAccount:
+    def __init__(self):
+        self.credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
+
+
+class TableSynchroniser(ServiceAccount):
     """
     The logic of the schema/table synchronisation is the following:
     If the table does not exist then create it
@@ -31,12 +39,11 @@ class TableSynchroniser:
     """
     def __init__(self, table_id: cs_model.TableId):
         # TODO: make this a table_or_tables: typing.Union[cs_model.TableId, cs_model.ListOfTables]
-        self.credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
+        super().__init__()
         self.client = bigquery.Client(project=CLOUD_PROJECT_ID, credentials=self.credentials, location=LOCATION)
         self.table_id = table_id
 
     def create_table(self) -> bool:
-        # TODO: make this create_table_or_tables
         """
         :links
             https://cloud.google.com/bigquery/docs/tables#python
@@ -52,7 +59,7 @@ class TableSynchroniser:
             Schema definition in json. E.g see tests/schema/schema_one_v1.json
         """
         url = urlunsplit((DATCAT_SCHEME, DATCAT_NETLOC, "/schemas/search_by_key", "", ""))
-        params = {"schema_name": self.table_name, "schema_version": self.table_version, "refresh": True}
+        params = {"schema_class_name": self.table_name, "schema_version": self.table_version, "refresh": True}
         response = requests.get(url=url, params=params)
 
         response.raise_for_status()
@@ -80,7 +87,7 @@ class TableSynchroniser:
             create: if the table does not exist
         """
         if not self.table_exists:
-            message: str = f"`{self.table_id}` Does not exist. Creating..."
+            message: str = f"`{self.table_id}` does not exist. Creating..."
             logging.info(message)
             return self.create_table()
 
@@ -135,19 +142,62 @@ class TopicSynchroniser:
     """
     This synchronises topics and subscribers
     """
-    def __init__(self):
-        self.credentials = service_account.Credentials.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
-        self.client = bigquery.Client(project=CLOUD_PROJECT_ID, credentials=self.credentials, location=LOCATION)
+    def __init__(self, topic_path: str):
+        super().__init__()
+        self.publisher = pubsub_v1.PublisherClient()
+        self.topic_path = topic_path
 
-    def create_topic(self):
-        pass
-
-    def check_topic_exists(self, collection_type: str) -> bool:
-        pass
-
-    def topic_config(self):
-        pass
+    def create_topic(self) -> bool:
+        self.publisher.create_topic(request={"name": self.topic_path})
+        return self.topic_exists
 
     @property
-    def topic_name(self):
-        pass
+    def project_path(self) -> str:
+        return f"projects/{CLOUD_PROJECT_ID}"
+
+    @property
+    def topic_exists(self) -> bool:
+        for topic in self.publisher.list_topics(request={"project": self.project_path}):
+            if topic.name == self.topic_path:
+                return True
+        return False
+
+    def synchronise(self) -> bool:
+        if not self.topic_exists:
+            message: str = f"`{self.topic_path}` does not exist. Creating..."
+            logging.info(message)
+            return self.create_topic()
+        return False
+
+
+class SubscriptionSynchroniser:
+    """
+    This synchronises topics and subscribers
+    """
+    def __init__(self, subscription_path: str, topic_path: str):
+        super().__init__()
+        self.subscriber = pubsub_v1.SubscriberClient()
+        self.subscription_path = subscription_path
+        self.topic_path = topic_path
+
+    def create_subscription(self) -> bool:
+        self.subscriber.create_subscription(request={"name": self.subscription_path, "topic": self.topic_path})
+        return self.subscription_exists
+
+    @property
+    def project_path(self) -> str:
+        return f"projects/{CLOUD_PROJECT_ID}"
+
+    @property
+    def subscription_exists(self) -> bool:
+        for subscription in self.subscriber.list_subscriptions(request={"project": self.project_path}):
+            if subscription.name == self.subscription_path:
+                return True
+        return False
+
+    def synchronise(self) -> bool:
+        if not self.subscription_exists:
+            message: str = f"`{self.subscription_path}` does not exist. Creating..."
+            logging.info(message)
+            return self.create_subscription()
+        return False
