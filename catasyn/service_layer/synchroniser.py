@@ -19,6 +19,7 @@ from catasyn.settings import (
 )
 
 DATCAT_NETLOC = f"{DATCAT_HOST}:{DATCAT_PORT}"
+PROJECT_PATH = f"projects/{CLOUD_PROJECT_ID}"
 
 # pubsub clients are suspected to only read from the env variable
 environ["GOOGLE_APPLICATION_CREDENTIALS"] = GOOGLE_APPLICATION_CREDENTIALS
@@ -164,12 +165,8 @@ class TopicSynchroniser:
         return self.topic_exists
 
     @property
-    def project_path(self) -> str:
-        return f"projects/{CLOUD_PROJECT_ID}"
-
-    @property
     def topic_exists(self) -> bool:
-        for topic in self.publisher.list_topics(request={"project": self.project_path}):
+        for topic in self.publisher.list_topics(request={"project": PROJECT_PATH}):
             if topic.name == self.topic_path:
                 return True
         return False
@@ -206,7 +203,7 @@ class SubscriptionSynchroniser:
     @property
     def subscription_exists(self) -> bool:
         for subscription in self.subscriber.list_subscriptions(
-            request={"project": self.project_path}
+            request={"project": PROJECT_PATH}
         ):
             if subscription.name == self.subscription_path:
                 return True
