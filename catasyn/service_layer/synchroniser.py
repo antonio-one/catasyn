@@ -166,10 +166,8 @@ class TopicSynchroniser:
 
     @property
     def topic_exists(self) -> bool:
-        for topic in self.publisher.list_topics(request={"project": PROJECT_PATH}):
-            if topic.name == self.topic_path:
-                return True
-        return False
+        topics = self.publisher.list_topics(request={"project": PROJECT_PATH})
+        return any(topic.name == self.topic_path for topic in topics)
 
     def synchronise(self) -> bool:
         if not self.topic_exists:
