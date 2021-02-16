@@ -28,14 +28,7 @@ class UnexpectedSchema(Exception):
     pass
 
 
-class ServiceAccount:
-    def __init__(self):
-        self.credentials = service_account.Credentials.from_service_account_file(
-            GOOGLE_APPLICATION_CREDENTIALS
-        )
-
-
-class TableSynchroniser(ServiceAccount):
+class TableSynchroniser():
     """
     The logic of the schema/table synchronisation is the following:
     If the table does not exist then create it
@@ -47,7 +40,9 @@ class TableSynchroniser(ServiceAccount):
 
     def __init__(self, table_id: cs_model.TableId):
         # TODO: make this a table_or_tables: typing.Union[cs_model.TableId, cs_model.ListOfTables]
-        super().__init__()
+        self.credentials = service_account.Credentials.from_service_account_file(
+            GOOGLE_APPLICATION_CREDENTIALS
+        )
         self.client = bigquery.Client(
             project=CLOUD_PROJECT_ID, credentials=self.credentials, location=LOCATION
         )
