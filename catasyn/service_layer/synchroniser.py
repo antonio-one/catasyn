@@ -195,17 +195,9 @@ class SubscriptionSynchroniser:
         return self.subscription_exists
 
     @property
-    def project_path(self) -> str:
-        return f"projects/{CLOUD_PROJECT_ID}"
-
-    @property
     def subscription_exists(self) -> bool:
-        for subscription in self.subscriber.list_subscriptions(
-            request={"project": PROJECT_PATH}
-        ):
-            if subscription.name == self.subscription_path:
-                return True
-        return False
+        subscriptions = self.subscriber.list_subscribers(request={"project": PROJECT_PATH})
+        return any(subscription.name == self.subscription_path for subscription in subscriptions)
 
     def synchronise(self) -> bool:
         if not self.subscription_exists:
