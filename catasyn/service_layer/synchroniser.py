@@ -196,7 +196,7 @@ class SubscriptionSynchroniser:
 
     @property
     def subscription_exists(self) -> bool:
-        subscriptions = self.subscriber.list_subscribers(request={"project": PROJECT_PATH})
+        subscriptions = self.subscriber.list_subscriptions(request={"project": PROJECT_PATH})
         return any(subscription.name == self.subscription_path for subscription in subscriptions)
 
     def synchronise(self) -> bool:
