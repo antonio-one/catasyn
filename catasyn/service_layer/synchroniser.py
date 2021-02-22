@@ -19,6 +19,7 @@ from catasyn.settings import (
 )
 
 DATCAT_NETLOC = f"{DATCAT_HOST}:{DATCAT_PORT}"
+PROJECT_PATH = f"projects/{CLOUD_PROJECT_ID}"
 
 # pubsub clients are suspected to only read from the env variable
 environ["GOOGLE_APPLICATION_CREDENTIALS"] = GOOGLE_APPLICATION_CREDENTIALS
@@ -28,14 +29,7 @@ class UnexpectedSchema(Exception):
     pass
 
 
-class ServiceAccount:
-    def __init__(self):
-        self.credentials = service_account.Credentials.from_service_account_file(
-            GOOGLE_APPLICATION_CREDENTIALS
-        )
-
-
-class TableSynchroniser(ServiceAccount):
+class TableSynchroniser():
     """
     The logic of the schema/table synchronisation is the following:
     If the table does not exist then create it
@@ -47,7 +41,9 @@ class TableSynchroniser(ServiceAccount):
 
     def __init__(self, table_id: cs_model.TableId):
         # TODO: make this a table_or_tables: typing.Union[cs_model.TableId, cs_model.ListOfTables]
-        super().__init__()
+        self.credentials = service_account.Credentials.from_service_account_file(
+            GOOGLE_APPLICATION_CREDENTIALS
+        )
         self.client = bigquery.Client(
             project=CLOUD_PROJECT_ID, credentials=self.credentials, location=LOCATION
         )
@@ -169,15 +165,9 @@ class TopicSynchroniser:
         return self.topic_exists
 
     @property
-    def project_path(self) -> str:
-        return f"projects/{CLOUD_PROJECT_ID}"
-
-    @property
     def topic_exists(self) -> bool:
-        for topic in self.publisher.list_topics(request={"project": self.project_path}):
-            if topic.name == self.topic_path:
-                return True
-        return False
+        topics = self.publisher.list_topics(request={"project": PROJECT_PATH})
+        return any(topic.name == self.topic_path for topic in topics)
 
     def synchronise(self) -> bool:
         if not self.topic_exists:
@@ -205,17 +195,9 @@ class SubscriptionSynchroniser:
         return self.subscription_exists
 
     @property
-    def project_path(self) -> str:
-        return f"projects/{CLOUD_PROJECT_ID}"
-
-    @property
     def subscription_exists(self) -> bool:
-        for subscription in self.subscriber.list_subscriptions(
-            request={"project": self.project_path}
-        ):
-            if subscription.name == self.subscription_path:
-                return True
-        return False
+        subscriptions = self.subscriber.list_subscribers(request={"project": PROJECT_PATH})
+        return any(subscription.name == self.subscription_path for subscription in subscriptions)
 
     def synchronise(self) -> bool:
         if not self.subscription_exists:

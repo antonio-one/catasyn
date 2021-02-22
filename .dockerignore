@@ -80,12 +80,8 @@ venv/
 
 # Python mode for VIM
 .ropeproject
-*/.ropeproject
-*/*/.ropeproject
-*/*/*/.ropeproject
+**.ropeproject
+
 
 # Vim swap files
-*.swp
-*/*.swp
-*/*/*.swp
-*/*/*/*.swp
+**.swp

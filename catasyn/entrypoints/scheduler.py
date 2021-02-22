@@ -23,7 +23,7 @@ from catasyn.settings import (
 
 
 def synchronise_all_schemas():
-    url_components: typing.Tuple = (
+    url_components = (
         DATCAT_SCHEME,
         f"{DATCAT_HOST}:{DATCAT_PORT}",
         "",
