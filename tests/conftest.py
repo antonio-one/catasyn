@@ -2,13 +2,17 @@ from urllib.parse import urlunsplit
 from uuid import uuid1
 
 import pytest
-from google.cloud import bigquery
-from catasyn.entrypoints import flask_app
-
-from catasyn.settings import DATCAT_SCHEME, DATCAT_HOST, DATCAT_PORT
-from catasyn.settings import CLOUD_PROJECT_ID, LOCATION
-
 import requests
+from google.cloud import bigquery
+
+from catasyn.entrypoints import flask_app
+from catasyn.settings import (
+    CLOUD_PROJECT_ID,
+    DATCAT_HOST,
+    DATCAT_PORT,
+    DATCAT_SCHEME,
+    LOCATION,
+)
 
 DATCAT_NETLOC = f"{DATCAT_HOST}:{DATCAT_PORT}"
 DATCAT_ROUTE = "search_by_key"
