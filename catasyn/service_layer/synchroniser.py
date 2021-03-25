@@ -67,10 +67,10 @@ class TableSynchroniser():
 
     def partition_column(self) -> str:
         for column in self.schema_from_catalogue():
-            with suppress(json.decoder.JSONDecodeError):
+            with suppress(json.decoder.JSONDecodeError, KeyError):
                 cd = column["description"]
                 cd = json.loads(cd)
-                if cd["option"] == "partition":
+                if cd["partition"] is True:
                     return column["name"]
 
     def schema_from_catalogue(self) -> dc_model.SchemaDefinition:
