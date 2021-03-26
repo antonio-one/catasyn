@@ -1,3 +1,4 @@
+import json
 import logging
 from os import environ
 from urllib.parse import urlunsplit
@@ -7,7 +8,7 @@ from datcat.domain import model as dc_model
 from google.cloud import bigquery, pubsub_v1
 from google.cloud.exceptions import NotFound
 from google.oauth2 import service_account
-
+from contextlib import suppress
 from catasyn.domain import model as cs_model
 from catasyn.settings import (
     CLOUD_PROJECT_ID,
@@ -55,8 +56,22 @@ class TableSynchroniser():
             https://cloud.google.com/bigquery/docs/tables#python
         """
         table = bigquery.Table(self.table_id, schema=self.schema_from_catalogue())
+        if self.partition_column():
+            table.time_partitioning = bigquery.TimePartitioning(
+                type_=bigquery.TimePartitioningType.DAY,
+                field=self.partition_column()
+            )
+
         self.client.create_table(table)
         return self.table_exists
+
+    def partition_column(self) -> str:
+        for column in self.schema_from_catalogue():
+            with suppress(json.decoder.JSONDecodeError, KeyError):
+                cd = column["description"]
+                cd = json.loads(cd)
+                if cd["partition"] is True:
+                    return column["name"]
 
     def schema_from_catalogue(self) -> dc_model.SchemaDefinition:
         """
@@ -73,7 +88,6 @@ class TableSynchroniser():
             "refresh": True,
         }
         response = requests.get(url=url, params=params)
-
         response.raise_for_status()
 
         return response.json()
@@ -196,7 +210,7 @@ class SubscriptionSynchroniser:
 
     @property
     def subscription_exists(self) -> bool:
-        subscriptions = self.subscriber.list_subscribers(request={"project": PROJECT_PATH})
+        subscriptions = self.subscriber.list_subscriptions(request={"project": PROJECT_PATH})
         return any(subscription.name == self.subscription_path for subscription in subscriptions)
 
     def synchronise(self) -> bool:

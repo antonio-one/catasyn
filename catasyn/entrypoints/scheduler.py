@@ -38,7 +38,7 @@ def synchronise_all_schemas():
         schemas = requests.get(url=url)
         schemas.raise_for_status()
     except requests.exceptions.ConnectionError:
-        logging.exception()
+        logging.exception("Unable to connect. Is datcat down?")
         return
     else:
         message = f"{url} returned status {schemas.status_code}"
@@ -66,7 +66,8 @@ def synchronise_all_topics():
         mappings = requests.get(url=url)
         mappings.raise_for_status()
     except requests.exceptions.ConnectionError:
-        logging.exception()
+        message = ""
+        logging.exception(message)
         return
     else:
         message = f"{url} returned status {mappings.status_code}"
