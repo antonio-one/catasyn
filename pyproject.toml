@@ -22,7 +22,7 @@ google-cloud-pubsub = "^2.3.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.10.0"
-pytest = "^6.2.2"
+pytest = "^6.2.3"
 pytest-cov = "^2.11.1"
 pytest-env = "^0.6.2"
 black = "^20.8b1"
