@@ -80,14 +80,13 @@ class TableSynchroniser():
             Schema definition in json. E.g see tests/schema/schema_one_v1.json
         """
         url = urlunsplit(
-            (DATCAT_SCHEME, DATCAT_NETLOC, "/schemas/search_by_key", "", "")
+            (DATCAT_SCHEME,
+             DATCAT_NETLOC,
+             f"/v1/datcat/schemas/get/{self.table_name}/version/{self.table_version}/refresh/true",
+             "", "")
         )
-        params = {
-            "schema_class_name": self.table_name,
-            "schema_version": self.table_version,
-            "refresh": True,
-        }
-        response = requests.get(url=url, params=params)
+
+        response = requests.get(url=url)
         response.raise_for_status()
 
         return response.json()

@@ -26,13 +26,13 @@ def client():
 
 
 @pytest.fixture(scope="session")
-def datcat_url():
-    return urlunsplit((DATCAT_SCHEME, DATCAT_NETLOC, "", "", ""))
+def list_schemas_url():
+    return urlunsplit((DATCAT_SCHEME, DATCAT_NETLOC, "/v1/datcat/schemas/list", "", ""))
 
 
 @pytest.fixture(scope="session")
-def schemas_from_catalogue(datcat_url):
-    response = requests.get(datcat_url)
+def schemas_from_catalogue(list_schemas_url):
+    response = requests.get(url=list_schemas_url)
     return response.json()
 
 
