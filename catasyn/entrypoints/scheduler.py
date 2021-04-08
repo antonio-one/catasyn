@@ -22,17 +22,16 @@ from catasyn.settings import (
 )
 
 
-def synchronise_all_schemas():
+def synchronise_all_schemas() -> None:
     url_components = (
         DATCAT_SCHEME,
         f"{DATCAT_HOST}:{DATCAT_PORT}",
-        "",
+        "v1/datcat/schemas/list/refresh/true",
         "",
         "",
     )
     url = urlunsplit(url_components)
 
-    # schemas.raise_for_status()
     # don't kill the service if there is a network error
     try:
         schemas = requests.get(url=url)
@@ -52,12 +51,12 @@ def synchronise_all_schemas():
         logging.debug(message)
 
 
-def synchronise_all_topics():
+def synchronise_all_topics() -> None:
     url_components: typing.Tuple = (
         DATCAT_SCHEME,
         f"{DATCAT_HOST}:{DATCAT_PORT}",
-        "mappings",
-        "refresh=True",
+        "v1/datcat/mappings/list/refresh/true",
+        "",
         "",
     )
     url = urlunsplit(url_components)
@@ -79,9 +78,7 @@ def synchronise_all_topics():
         topic_path = f"projects/{CLOUD_PROJECT_ID}/topics/{topic_name}"
 
         subscription_name = mappings["subscription_name"]
-        subscription_path = (
-            f"projects/{CLOUD_PROJECT_ID}/subscriptions/{subscription_name}"
-        )
+        subscription_path = f"projects/{CLOUD_PROJECT_ID}/subscriptions/{subscription_name}"
 
         syn = TopicSynchroniser(topic_path=topic_path)
         synchronised_status: bool = syn.synchronise()
@@ -96,13 +93,13 @@ def synchronise_all_topics():
         logging.debug(message)
 
 
-def synchronise_everything():
+def synchronise_everything() -> None:
     synchronise_all_schemas()
     synchronise_all_topics()
 
 
-def main():
-    schedule.every(SCHEDULE_INTERVAL_SECONDS).seconds.do(synchronise_everything)
+def main(schedule_interval_seconds: int = SCHEDULE_INTERVAL_SECONDS) -> None:
+    schedule.every(interval=schedule_interval_seconds).seconds.do(job_func=synchronise_everything)
     while True:
         schedule.run_pending()
         sleep(SCHEDULE_SLEEP_SECONDS)

@@ -9,3 +9,4 @@ catalogue/schemas/*.json
 dist
 .coverage--all
 MAPPINGS_FILEPATH not found. Declare it as envvar or define a default value.git branchgitgit checkout main
+tests/pytest.ini
