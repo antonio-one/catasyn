@@ -297,7 +297,7 @@ grpc = ["grpcio (>=1.8.2,<2.0dev)"]
 
 [[package]]
 name = "google-cloud-pubsub"
-version = "2.4.1"
+version = "2.4.2"
 description = "Google Cloud Pub/Sub API client library"
 category = "main"
 optional = false
@@ -875,7 +875,7 @@ watchdog = ["watchdog"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8.0,<3.10"
-content-hash = "101be7db3b5d3118c74ff4ef05063453c7aa1e9df73a992ecdbe373200449061"
+content-hash = "89e1a622dcfca3e8c1002268621ac02614c33699335143af19604102b691c243"
 
 [metadata.files]
 appdirs = [
@@ -1055,8 +1055,8 @@ google-cloud-core = [
     {file = "google_cloud_core-1.6.0-py2.py3-none-any.whl", hash = "sha256:40d9c2da2d03549b5ac3dcccf289d4f15e6d1210044c6381ce45c92913e62904"},
 ]
 google-cloud-pubsub = [
-    {file = "google-cloud-pubsub-2.4.1.tar.gz", hash = "sha256:e60caa67e26d842fd08daf19097efdaf82be7afb996398cf67bddc03a86b8120"},
-    {file = "google_cloud_pubsub-2.4.1-py2.py3-none-any.whl", hash = "sha256:8cfad9f777dfbf6715f1d72a529c476ad33758c280826ace532600ae2ead9b48"},
+    {file = "google-cloud-pubsub-2.4.2.tar.gz", hash = "sha256:53a0ca597c2b29def8d8d8247e46963e3c8d6968a1a480f6906c3ba618310ad8"},
+    {file = "google_cloud_pubsub-2.4.2-py2.py3-none-any.whl", hash = "sha256:bd21c2c8f8118213ee5db6cdd2208031a20e5cb8d46c3608fa29eb286bac35df"},
 ]
 google-crc32c = [
     {file = "google-crc32c-1.1.2.tar.gz", hash = "sha256:dff5bd1236737f66950999d25de7a78144548ebac7788d30ada8c1b6ead60b27"},
