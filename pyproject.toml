@@ -11,7 +11,7 @@ keywords = ["python", "flask", "data", "synchronisation", "api", "pubsub", "bigq
 
 [tool.poetry.dependencies]
 python = ">=3.8.0,<3.10"
-Flask = "^1.1.2"
+Flask = "^1.1.4"
 Flask-API = "^2.0"
 python-decouple = "^3.4"
 schedule = "^1.0.0"
